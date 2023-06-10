@@ -1,25 +1,47 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
 
-function App() {
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
+
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <Example />
+    </QueryClientProvider>
   );
 }
 
-export default App;
+function Example() {
+  const { isLoading, error, data } = useQuery({
+    queryKey: ["repoData"],
+    queryFn: () =>
+      fetch("https://jsonplaceholder.typicode.com/posts").then((res) =>
+        res.json().then((res.json = data))
+      ),
+  });
+
+  console.log(data);
+  if (isLoading) return "Loading...";
+
+  if (error) return "An error has occurred: " + error.message;
+
+  return (
+    <div>
+      {Array.isArray(data) &&
+        data.map((post, i) => {
+          return (
+            <div>
+              <h1 key={i}>{post.title}</h1>
+              <p key={i}>{post.body}</p>;<strong>👀 Id: {post.id}</strong>{" "}
+              <strong>✨User Id: {post.userId}</strong>{" "}
+            </div>
+          );
+        })}
+    </div>
+  );
+}
